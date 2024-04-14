@@ -1,0 +1,20 @@
+import Adafruit_DHT
+import time
+import RPi.GPIO as GPIO
+import urllib.request
+
+GPIO.setmode(GPIO.BCM)
+pin = 2
+
+while True:
+    humidity, temperature=Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, pin)
+    if humidity is not None and temperature is not None:
+        print('Temperature={0:0.1f}deg C humidity = {1:0.1f}%'.format(temperature, humidity))  
+    else:
+        print('failed to get reading try again')
+       
+    time.sleep(10)
+    url = "https://api.thingspeak.com/update?api_key=46KMODHBXKG0HP3Y&field1={}&field2={}".format(temperature, humidity)
+    f = urllib.request.urlopen(url)
+    print(f.read())
+    f.close()
